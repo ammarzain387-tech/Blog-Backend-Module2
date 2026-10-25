@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - My Blog</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Navbar (Dashboard ke liye thodi mukhtalif hogi) -->
+    <nav class="navbar">
+        <h2 class="logo">My Blog</h2>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="create-blog.html">Create Blog</a></li>
+            <li><a href="login.html">Logout</a></li>
+        </ul>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <main class="container">
+        <h1>Welcome, Zain!</h1>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Your Blogs</h2>
+            <!-- Naya blog likhne ka button -->
+            <a href="create-blog.html" class="btn" style="text-decoration: none;">+ Write New Blog</a>
+        </div>
+
+        <div class="blog-grid">
+            <!-- User ka apna blog card -->
+            <div class="blog-card">
+                <h3>My First Blog Journey</h3>
+                <p>Aaj maine Frontend development seekhna shuru kiya aur apna pehla blog banaya...</p>
+                <button class="btn" style="background-color: #e74c3c;">Delete</button>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

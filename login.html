@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - My Blog</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <h2 class="logo">My Blog</h2>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="register.html">Register</a></li>
+        </ul>
+    </nav>
+
+    <div class="form-container">
+        <h2>Login to Your Account</h2>
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="Email Address" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit" class="btn">Login</button>
+        </form>
+        <p style="margin-top: 15px;">Don't have an account? <a href="register.html"
+                style="color: #3498db; text-decoration: none;">Register here</a></p>
+    </div>
+
+    <!-- Yeh JavaScript Backend se baat karegi -->
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function (event) {
+            event.preventDefault(); // Page ko reload hone se rokega
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Backend API ko POST request bhejna
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({email, password})
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert(data.message); // "Login successful!" ka message
+                window.location.href = 'dashboard.html'; // Login hone ke baad Dashboard par le jao
+            } else {
+                alert("Error: " + data.message); // Agar password galat ho toh error
+            }
+        });
+    </script>
+</body>
+
+</html>
