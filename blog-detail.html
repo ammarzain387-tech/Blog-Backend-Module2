@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Detail - My Blog</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <h2 class="logo">My Blog</h2>
+        <ul class="nav-links">
+            <li><a href="dashboard.html">Back to Dashboard</a></li>
+        </ul>
+    </nav>
+
+    <div class="container" style="padding: 40px; max-width: 800px; margin: auto;">
+        <!-- Yahan par API se data aayega -->
+        <h1 id="blog-title">Loading...</h1>
+        <p id="blog-desc" style="margin-top: 20px; line-height: 1.6;"></p>
+    </div>
+
+    <script>
+        async function fetchSingleBlog() {
+            // URL se Blog ki ID nikalna (jaise ?id=12345)
+            const urlParams = new URLSearchParams(window.location.search);
+            const blogId = urlParams.get('id');
+
+            if (!blogId) {
+                document.getElementById('blog-title').innerText = "Blog ID nahi mili!";
+                return;
+            }
+
+            try {
+                // Backend se us makhsoos ID wala blog mangwana
+                const response = await fetch(`/blog/${blogId}`);
+                const blog = await response.json();
+
+                // Screen par data dikhana
+                document.getElementById('blog-title').innerText = blog.title;
+                document.getElementById('blog-desc').innerText = blog.description;
+            } catch (error) {
+                document.getElementById('blog-title').innerText = "Error aa gaya!";
+            }
+        }
+
+        fetchSingleBlog();
+    </script>
+</body>
+
+</html>
