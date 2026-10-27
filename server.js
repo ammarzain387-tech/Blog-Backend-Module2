@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const app = express();
 const PORT = 3000;
 // MongoDB Connection
-const dbURI = 'mongodb+srv://ammarzain387_db_user:1KgyuInILTptUZO3@zain.k0kvnne.mongodb.net/';
+const dbURI = 'mongodb+srv://ammarzain387_db_user:Zain2277@zain.k0kvnne.mongodb.net/';
 
 mongoose.connect(dbURI)
     .then(() => console.log('MongoDB se successfully connect ho gaya! 🎉'))
@@ -112,6 +112,31 @@ app.get('/blog/:id', async (req, res) => {
     } catch (error) {
         console.log("Single Blog Error:", error);
         res.status(500).json({ message: "Blog nahi mil saka!" });
+    }
+});
+
+// 6. Kisi blog ko Delete karne ki API
+app.delete('/blog/:id', async (req, res) => {
+    try {
+        // Jo ID aayegi, usay database se hamesha ke liye delete kar do
+        await Blog.findByIdAndDelete(req.params.id);
+        res.json({ message: "Blog successfully delete ho gaya!" });
+    } catch (error) {
+        console.log("Delete Error:", error);
+        res.status(500).json({ message: "Blog delete nahi ho saka!" });
+    }
+});
+
+// 7. Kisi blog ko Update (Edit) karne ki API
+app.put('/blog/:id', async (req, res) => {
+    try {
+        const { title, description, image } = req.body;
+        // ID ke zariye blog dhoondo aur naye data se update kar do
+        await Blog.findByIdAndUpdate(req.params.id, { title, description, image });
+        res.json({ message: "Blog successfully update ho gaya!" });
+    } catch (error) {
+        console.log("Update Error:", error);
+        res.status(500).json({ message: "Blog update nahi ho saka!" });
     }
 });
 

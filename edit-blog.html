@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Blog - My Blog</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <h2 class="logo">My Blog</h2>
+        <ul class="nav-links">
+            <li><a href="dashboard.html">Back to Dashboard</a></li>
+        </ul>
+    </nav>
+
+    <div class="container" style="padding: 20px; max-width: 600px; margin: auto;">
+        <h2>Edit Blog</h2>
+        <form id="editForm">
+            <input type="text" id="title" required style="width: 100%; padding: 10px; margin-bottom: 10px;"
+                placeholder="Blog Title">
+            <textarea id="description" required style="width: 100%; padding: 10px; margin-bottom: 10px; height: 150px;"
+                placeholder="Blog Description"></textarea>
+            <button type="submit"
+                style="padding: 10px 20px; background: #3498db; color: white; border: none; cursor: pointer;">Update
+                Blog</button>
+        </form>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const blogId = urlParams.get('id');
+
+        // 1. Page load hote hi purana data form mein bharna
+        async function loadBlogData() {
+            try {
+                const response = await fetch(`/blog/${blogId}`);
+                const blog = await response.json();
+                document.getElementById('title').value = blog.title;
+                document.getElementById('description').value = blog.description;
+            } catch (error) {
+                alert("Blog ka data nahi mil saka!");
+            }
+        }
+        loadBlogData();
+
+        // 2. Form submit hone par naya data save karna
+        document.getElementById('editForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+
+            try {
+                const response = await fetch(`/blog/${blogId}`, {
+                    method: 'PUT', // Update ke liye PUT method
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, description })
+                });
+                const data = await response.json();
+                alert(data.message);
+                window.location.href = 'dashboard.html'; // Wapis dashboard par bhej do
+            } catch (error) {
+                alert("Update karne mein masla aa gaya!");
+            }
+        });
+    </script>
+</body>
+
+</html>
