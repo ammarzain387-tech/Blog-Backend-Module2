@@ -31,26 +31,32 @@
 
     <!-- Yeh JavaScript Backend se baat karegi -->
     <script>
-        document.getElementById('loginForm').addEventListener('submit', async function (event) {
-            event.preventDefault(); // Page ko reload hone se rokega
-
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            // Backend API ko POST request bhejna
-            const response = await fetch('/login', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({email, password})
-            });
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
 
-            const data = await response.json();
+                const data = await response.json();
 
-            if (response.ok) {
-                alert(data.message); // "Login successful!" ka message
-                window.location.href = 'dashboard.html'; // Login hone ke baad Dashboard par le jao
-            } else {
-                alert("Error: " + data.message); // Agar password galat ho toh error
+                if (response.ok) {
+                    // Token aur User ID ko localStorage mein save karein
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('userId', data.userId);
+
+                    alert(data.message);
+                    window.location.href = 'dashboard.html'; // Dashboard par bhej do
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                alert("Login mein error aa gaya!");
             }
         });
     </script>

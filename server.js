@@ -1,14 +1,23 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
+
 const app = express();
 const PORT = 3000;
+const JWT_SECRET = "mera_secret_key_123";
+
+// Middleware
+app.use(express.json());
+app.use(express.static('public'));
+
 // MongoDB Connection
 const dbURI = 'mongodb+srv://ammarzain387_db_user:Zain2277@zain.k0kvnne.mongodb.net/';
 
 mongoose.connect(dbURI)
     .then(() => console.log('MongoDB se successfully connect ho gaya! 🎉'))
     .catch((err) => console.log('Database connection error:', err));
-// 1. User ka Structure (Schema)
+
+// 1. User Schema
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -16,85 +25,66 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model('User', userSchema);
 
-// 2. Blog ka Structure (Schema)
+// 2. Blog Schema
 const blogSchema = new mongoose.Schema({
     title: { type: String, required: true },
     description: { type: String, required: true },
-    image: { type: String }
+    image: { type: String },
+    authorId: { type: String }
 });
 const Blog = mongoose.model('Blog', blogSchema);
 
-// Frontend se aane wale data ko samajhne ke liye
-app.use(express.json());
-app.use(express.static('public'));
-// Data save karne ke liye temporary lists (Database ki jagah)
+// --- APIs ---
 
-// 1. User Registration API (Database ke sath)
+// Register API
 app.post('/register', async (req, res) => {
     try {
         const { name, email, password } = req.body;
-
-        // Pehle check karein ke kya is email se account pehle se bana hua hai?
         const existingUser = await User.findOne({ email: email });
         if (existingUser) {
-            return res.status(400).json({ message: "Yeh email pehle se mojood hai! Koi aur email use karein." });
+            return res.status(400).json({ message: "Yeh email pehle se mojood hai!" });
         }
-
-        // Agar nahi hai, toh naya user Database mein save karein
         const newUser = new User({ name, email, password });
         await newUser.save();
-
-        console.log("Naya user database mein save ho gaya:", email);
         res.json({ message: "User successfully registered!" });
     } catch (error) {
-        console.log("Register API Error:", error);
+        console.log("Register Error:", error);
         res.status(500).json({ message: "Database mein error aa gaya!" });
     }
 });
 
-// 2. User Login API (Database ke sath)
+// Login API
 app.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-
-        // Database mein check karein ke is email ka koi user hai ya nahi?
         const user = await User.findOne({ email: email });
-
-        // Agar user na mile ya password match na kare
         if (!user || user.password !== password) {
             return res.status(400).json({ message: "Ghalat email ya password!" });
         }
-
-        // Agar sab theek hai toh login success
-        console.log("User login ho gaya:", email);
-        res.json({ message: "Login successful!" });
+        const token = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+        res.json({ message: "Login successful!", token: token, userId: user._id });
     } catch (error) {
-        console.log("Login API Error:", error);
+        console.log("Login Error:", error);
         res.status(500).json({ message: "Database mein error aa gaya!" });
     }
 });
 
-// 3. Create Blog API (Database ke sath)
+// Create Blog API
 app.post('/create-blog', async (req, res) => {
     try {
-        const { title, description, image } = req.body;
-
-        // Naya blog banayen aur usay MongoDB mein save karein
-        const newBlog = new Blog({ title, description, image });
+        const { title, description, image, authorId } = req.body;
+        const newBlog = new Blog({ title, description, image, authorId });
         await newBlog.save();
-
-        console.log("Naya blog database mein save ho gaya:", title);
         res.json({ message: "Blog created successfully!" });
     } catch (error) {
-        console.log("Create Blog API Error:", error);
+        console.log("Create Blog Error:", error);
         res.status(500).json({ message: "Database mein error aa gaya!" });
     }
 });
 
-// 4. Sab blogs ko nikalne ki API (Dashboard ke liye)
+// Fetch All Blogs API
 app.get('/blogs', async (req, res) => {
     try {
-        // Database se tamam blogs nikal lo
         const allBlogs = await Blog.find();
         res.json(allBlogs);
     } catch (error) {
@@ -103,10 +93,9 @@ app.get('/blogs', async (req, res) => {
     }
 });
 
-// 5. Kisi ek specific blog ko ID ke zariye nikalne ki API
+// Single Blog API
 app.get('/blog/:id', async (req, res) => {
     try {
-        // Jo ID URL mein aayegi, us ID wala blog database se dhoondo
         const singleBlog = await Blog.findById(req.params.id);
         res.json(singleBlog);
     } catch (error) {
@@ -115,10 +104,9 @@ app.get('/blog/:id', async (req, res) => {
     }
 });
 
-// 6. Kisi blog ko Delete karne ki API
+// Delete Blog API
 app.delete('/blog/:id', async (req, res) => {
     try {
-        // Jo ID aayegi, usay database se hamesha ke liye delete kar do
         await Blog.findByIdAndDelete(req.params.id);
         res.json({ message: "Blog successfully delete ho gaya!" });
     } catch (error) {
@@ -127,11 +115,10 @@ app.delete('/blog/:id', async (req, res) => {
     }
 });
 
-// 7. Kisi blog ko Update (Edit) karne ki API
+// Update Blog API
 app.put('/blog/:id', async (req, res) => {
     try {
         const { title, description, image } = req.body;
-        // ID ke zariye blog dhoondo aur naye data se update kar do
         await Blog.findByIdAndUpdate(req.params.id, { title, description, image });
         res.json({ message: "Blog successfully update ho gaya!" });
     } catch (error) {
@@ -140,7 +127,7 @@ app.put('/blog/:id', async (req, res) => {
     }
 });
 
-// Server Start karna
+// Server Listen
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });

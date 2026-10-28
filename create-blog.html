@@ -43,27 +43,24 @@
 
     <!-- Yeh JavaScript Backend API ko naya blog bheji gi -->
     <script>
-        document.getElementById('createBlogForm').addEventListener('submit', async function (event) {
-            event.preventDefault(); // Page reload hone se rokega
-
+        document.getElementById('createBlogForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
             const title = document.getElementById('title').value;
             const description = document.getElementById('description').value;
-            const image = document.getElementById('image').value;
+            const authorId = localStorage.getItem('userId'); // Logged-in user ki ID
 
-            // Backend ke '/create-blog' route par data bhejna
-            const response = await fetch('/create-blog', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({title, description, image})
-            });
+            try {
+                const response = await fetch('/create-blog', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, description, authorId })
+                });
 
-            const data = await response.json();
-
-            if (response.ok) {
-                alert(data.message); // "Blog created successfully!" ka message
-                window.location.href = 'dashboard.html'; // Wapis dashboard par le jao
-            } else {
-                alert("Error aa gaya!");
+                const data = await response.json();
+                alert(data.message);
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                alert("Blog create karne mein masla aaya!");
             }
         });
     </script>
