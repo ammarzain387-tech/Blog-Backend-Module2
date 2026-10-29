@@ -3,15 +3,17 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 
 const app = express();
-const PORT = 3000;
-const JWT_SECRET = "mera_secret_key_123";
+
+// Render ke dynamic Port ke liye process.env.PORT lazmi hai
+const PORT = process.env.PORT || 3000;
+const JWT_SECRET = process.env.JWT_SECRET || "mera_secret_key_123";
 
 // Middleware
 app.use(express.json());
 app.use(express.static('public'));
 
-// MongoDB Connection
-const dbURI = 'mongodb+srv://ammarzain387_db_user:Zain2277@zain.k0kvnne.mongodb.net/';
+// MongoDB Connection (Environment variable ya fallback URI)
+const dbURI = process.env.MONGODB_URI || 'mongodb+srv://ammarzain387_db_user:Zain2277@zain.k0kvnne.mongodb.net/';
 
 mongoose.connect(dbURI)
     .then(() => console.log('MongoDB se successfully connect ho gaya! 🎉'))
@@ -129,5 +131,5 @@ app.put('/blog/:id', async (req, res) => {
 
 // Server Listen
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
